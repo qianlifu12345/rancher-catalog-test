@@ -1,0 +1,45 @@
+.catalog:
+  name: "Rancher Flat Network"
+  version: "0.0.1"
+  questions:
+  - variable: CNI_INTERFACE_NAME
+    label: CNI Interface Name
+    type: string
+    description: CNI Interface which is used for flat network.
+  - variable: CNI_CATTLE_IPADDR
+    label: Cattle IP address
+    type: string
+    description: Cattle IP address.
+
+flatnet:
+  network_driver:
+    name: Rancher Flat Network
+    default_network:
+      name: flatnet
+      host_ports: false
+      subnets:
+      - 
+        network_address: '10.15.12.0/22'
+        cidr_size: 22
+        start_address: '10.15.12.1'
+        end_address: '10.15.15.252'
+      dns:
+      - 169.254.169.250
+      dns_search:
+      - rancher.internal
+    cni_config:
+      '11-rancher.conf':
+        name: rancher-cni-network
+        type: rancher-cni-bridge
+        bridge: br0
+        bridgeSubnet: '10.15.12.0/22'
+        isDefaultGateway: true
+        hostNat: false
+        hairpinMode: true
+        linkMTUOverhead: 98
+        ipam:
+          type: rancher-cni-ipam
+          logToFile: /var/log/rancher-ipam.log
+          gateway: '10.15.15.254'
+          routes:
+          - {dst: 169.254.169.250/32, gw: 10.15.15.253}
